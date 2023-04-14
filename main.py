@@ -3,7 +3,7 @@ import struct
 import textwrap
 
 def main():
-    conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
+    conn = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.ntohs(3))
 
     while True:
         raw_data, addr = conn.recvfrom(65536)
@@ -24,5 +24,14 @@ def get_mac_addr(bytes_addr):
     mac_addr = ':'.join(bytes_str).upper()
     return mac_addr
 
+# Unpack IPV4 Packet
+def ipv4_packet(data):
+    version_header_length = data[0]
+    version = version_header_length >> 4
+    header_length = (version_header_length & 15) * 4
+    ttl, proto, src, target = struct.unpack('! 8x B B 2x 4s 4s', data[:20])
+    return version, header_length, ttl, proto, ipv4_add(src), ipv4_add(target), data(header_length:)
 
-main()
+# Returns properly fromatted Ipv4 address
+def ipv4_add(addr):
+    return '.'.join(map(str, addr))

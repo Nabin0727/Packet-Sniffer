@@ -3,6 +3,10 @@ import struct
 import textwrap
 
 Tab_1 = '\t - '
+Tab_2 = '\t\t - '
+Tab_3 = '\t\t\t - '
+Tab_4 = '\t\t\t\t - '
+
 def main():
 
     print("Starting packet sniffer...")
@@ -26,38 +30,38 @@ def main():
         if eth_proto == 8:
             (version, header_length, ttl, proto, src, target, data) = ipv4_packet(data)
             print(Tab_1 + "IPv4 Packet:")
-            print(Tab_1 + Tab_1 + "Version: {}, Header Lenght: {}, TTL: {}".format(version, header_length, ttl))
-            print(Tab_1 + Tab_1 + 'Protocol: {}, Soucrce: {}, Target: {}'.format(proto, src, target))
+            print(Tab_2 + "Version: {}, Header Lenght: {}, TTL: {}".format(version, header_length, ttl))
+            print(Tab_2 + 'Protocol: {}, Soucrce: {}, Target: {}'.format(proto, src, target))
 
             # ICMP 
             if proto == 1:
                 icmp_type, code, checksum, data = icmp_packet(data)
                 print(Tab_1 + "ICMP Packet:")
-                print(Tab_1 + Tab_1 + "Type: {}, Code: {}, Checksum: {}".format(icmp_type, code, checksum))
-                print(Tab_1 + Tab_1 + 'Data:')
+                print(Tab_2 + "Type: {}, Code: {}, Checksum: {}".format(icmp_type, code, checksum))
+                print(Tab_2 + 'Data:')
                 print(format_multi_line(Tab_1 + Tab_1 + Tab_1, data))
             
             # TCP
             elif proto == 6:
                 (src_port, dest_port, sequence, acknowledgement, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin, data) = tcp_segement(data)
                 print(Tab_1 + "TCP Segment:")
-                print(Tab_1 + Tab_1 + "Source Port: {}, Destination Port: {}".format(src_port, dest_port))
-                print(Tab_1 + Tab_1 + "Sequence: {}, Acknowledgement: {}".format(sequence, acknowledgement))
-                print(Tab_1 + Tab_1 + 'Flags:')
-                print(Tab_1 + Tab_1 + Tab_1 + "URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}".format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
-                print(Tab_1 + Tab_1 + 'Data:')
-                print(format_multi_line(Tab_1 + Tab_1 + Tab_1, data))
+                print(Tab_2 + "Source Port: {}, Destination Port: {}".format(src_port, dest_port))
+                print(Tab_2 + "Sequence: {}, Acknowledgement: {}".format(sequence, acknowledgement))
+                print(Tab_2 + 'Flags:')
+                print(Tab_2 + Tab_1 + "URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FIN: {}".format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fin))
+                print(Tab_2 + 'Data:')
+                print(format_multi_line(Tab_3, data))
 
             # UDP
             elif proto == 17:
                 (scr_port, dest_port, size , data) = udp_segment(data)
                 print(Tab_1 + "UDP Segment:")
-                print(Tab_1 + Tab_1 + "Source Port: {}, Destination Port: {}, Length: {}".format(scr_port, dest_port, size))
+                print(Tab_2 + "Source Port: {}, Destination Port: {}, Length: {}".format(scr_port, dest_port, size))
 
             # Other
             else:
                 print(Tab_1 + "Data:")
-                print(format_multi_line(Tab_1 + Tab_1, data))
+                print(format_multi_line(Tab_2, data))
         else:
             print(Tab_1 + "Data:")
             print(format_multi_line(Tab_1, data))

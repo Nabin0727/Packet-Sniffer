@@ -1,11 +1,25 @@
 #include<stdio.h>
 #include<pcap.h>
 
+void packet_handler(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
+    printf("\n=== Packet Captured ===\n");
+    printf("Packet length: %d bytes\n", header->len);
+    printf("Captured length: %d bytes\n", header->caplen);
+    printf("Timestamp: %ld.%06ld\n", header->ts.tv_sec, header->ts.tv_usec);
+
+    // Print first 16 bytes
+    printf("First 16 bytes: ");
+    for (int i = 0; i < 16 && i < header->caplen; i++) {
+        printf("%02x ", packet[i]);
+    }
+    printf("\n");
+}
+
 int main()
 {
 	char *dev = "eth0"; // interface
 	
-	char errbuf[PACP_ERRBUF_SIZE];
+	char errbuf[PCAP_ERRBUF_SIZE];
 
 	pcap_t *handel;
 
@@ -23,7 +37,8 @@ int main()
 	}
 
 	printf("Capturing packet on %s........\n", dev);
-
+	
+	pcap_loop(handel, 10, packet_handler, NULL);
 
 	pcap_close(handel);
 	return 0;

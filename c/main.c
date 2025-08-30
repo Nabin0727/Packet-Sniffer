@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<pcap.h>
 
-void packet_handler(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
+void packet_handler(u_char *dump_handel, const struct pcap_pkthdr *header, const u_char *packet) {
     printf("\n=== Packet Captured ===\n");
     printf("Packet length: %d bytes\n", header->len);
     printf("Captured length: %d bytes\n", header->caplen);
@@ -13,6 +13,8 @@ void packet_handler(u_char *args, const struct pcap_pkthdr *header, const u_char
         printf("%02x ", packet[i]);
     }
     printf("\n");
+
+    pcap_dump(dump_handel, header, packet);
 }
 
 int main()
@@ -36,10 +38,14 @@ int main()
 		return 2;
 	}
 
+	// open dump file
+	pcap_dumper_t *dumper = pcap_dump_open(handel, "capture.pcap");
+
 	printf("Capturing packet on %s........\n", dev);
 	
-	pcap_loop(handel, 10, packet_handler, NULL);
+	pcap_loop(handel, 10, packet_handler, (u_char *)dumper);
 
 	pcap_close(handel);
+	pcap_dump_close(dumper);
 	return 0;
 }

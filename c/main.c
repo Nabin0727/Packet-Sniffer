@@ -1,6 +1,9 @@
+// writing simple packet capture in c
+
 #include<stdio.h>
 #include<pcap.h>
 
+// packet capture handeler function
 void packet_handler(u_char *dump_handel, const struct pcap_pkthdr *header, const u_char *packet) {
     printf("\n=== Packet Captured ===\n");
     printf("Packet length: %d bytes\n", header->len);
@@ -13,7 +16,7 @@ void packet_handler(u_char *dump_handel, const struct pcap_pkthdr *header, const
         printf("%02x ", packet[i]);
     }
     printf("\n");
-
+	// dumping captured packet
     pcap_dump(dump_handel, header, packet);
 }
 
@@ -40,6 +43,10 @@ int main()
 
 	// open dump file
 	pcap_dumper_t *dumper = pcap_dump_open(handel, "capture.pcap");
+	if(dumper == NULL){
+		fprintf(stderr, "couldnot open dump");
+		return 2;
+	}
 
 	printf("Capturing packet on %s........\n", dev);
 	

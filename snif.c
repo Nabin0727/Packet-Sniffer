@@ -54,15 +54,25 @@ int main( int argc, char const *argvc[])
 	
 	//int packets_count = 5;
 	
-	// pacp_loop retunrs 0 upon success and -1 if it fails, we listen to this return value and print and error if 
+	// Setup Ctrl + C
+	struct sigactioin sa;
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = handle_sigint;
+	sigaction(SIGINT, &sa, NULL);
+
+	//Start capturing the packets 
+	//pacp_loop retunrs 0 upon success and -1 if it fails, we listen to this return value and print and error if 
 	// pcap_loop failed
 	
-	if(pcap_loop( capdev, packets_count, call_me, (u_char*)NULL))
+	if(pcap_loop( global_capdev, -1, call_me, (u_char*)NULL))
 	{
 		printf("ERR: pcap_loop() failed!\n");
 		exit(1);
 	}
 
+	// Closing 
+	printf("\nCaptured finished. Closing device.\n");
+	pcap_close(global_capdev);
 	return 0;
 
 }

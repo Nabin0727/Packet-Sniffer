@@ -29,26 +29,30 @@ int main( int argc, char const *argvc[])
 
 	char *device = "ens192";
 	char error_buffer[PCAP_ERRBUF_SIZE];
+	int snaplen = BUFSIZ;
+	int promisc = 0;
+	int timeout_ms = 1000;
 
 	// BUFSIZ is defined in stdio.h, 0 to disable promiscuous mode and -1 to diable timeout
 	//
 
-	pcap_t *capdev = pcap_open_live(device, BUFSIZ, 0, -1, error_buffer);
-	
-	
+	// Override the device with user input
+	if(arg > 1) device = argv[1];
+
+	global_capdev= pcap_open_live(device, snaplen, promisc, timeout_ms, error_buffer);
+
 	// If capdev is null that means something went wrong, so we print the error which is stored in error_buffer and exit
 	// the program
-	
-	if(capdev == NULL)
+	if(!global_capdev)
 	{
-		printf("ERR: pcap_open_live() %s\n", error_buffer);
-		exit(1);
+		fprintf(stderr, "Error opening devices %s: %s\n", device, error_buffer);
+		return 1;
 	}
-	
+
 	// Let's limit the capture to 5 packets 
 	//
 	
-	int packets_count = 5;
+	//int packets_count = 5;
 	
 	// pacp_loop retunrs 0 upon success and -1 if it fails, we listen to this return value and print and error if 
 	// pcap_loop failed

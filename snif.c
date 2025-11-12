@@ -2,6 +2,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<pcap/pcap.h>
+#include<stdlib.h>
+#include<string.h>
+#include<signal.h>
 
 //Global function to handel signal
 static pcap_t *global_capdev = NULL;
@@ -37,7 +40,10 @@ int main( int argc, char const *argvc[])
 	//
 
 	// Override the device with user input
-	if(arg > 1) device = argv[1];
+	if(argc > 1) 
+	{
+		strncpy(device, argvc[1], (sizeof(argvc[1] - 1)));
+	}
 
 	global_capdev= pcap_open_live(device, snaplen, promisc, timeout_ms, error_buffer);
 
@@ -50,12 +56,10 @@ int main( int argc, char const *argvc[])
 	}
 
 	// Let's limit the capture to 5 packets 
-	//
-	
 	//int packets_count = 5;
 	
 	// Setup Ctrl + C
-	struct sigactioin sa;
+	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = handle_sigint;
 	sigaction(SIGINT, &sa, NULL);

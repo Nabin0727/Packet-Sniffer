@@ -115,9 +115,16 @@ int main( int argc, char const *argvc[])
 	//pacp_loop retunrs 0 upon success and -1 if it fails, we listen to this return value and print and error if 
 	// pcap_loop failed
 	
-	if(pcap_loop( global_capdev, -1, call_me, (u_char*)NULL))
+	int flag = pacp_loop(global_capdev, -1, call_me, NULL);
+
+	if(falg == -1)
 	{
-		printf("ERR: pcap_loop() failed!\n");
+		fprintf(stderr, "ERR: pcap_loop() failed: %s\n", pcap_geterr(global_capdev));
+		exit(1);
+	}
+	else if(flag == -2)
+	{
+		printf("\nCapture stopped by user (Ctrl+C).\n");
 		exit(1);
 	}
 

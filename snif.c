@@ -6,7 +6,8 @@
 #include<string.h>
 #include<signal.h>
 #include<arpa/inet.h>
-#include<netinet/inet.h>
+#include<netinet/in.h>
+#include<netinet/ip.h>
 
 //Global function to handel signal
 static pcap_t *global_capdev = NULL;
@@ -29,12 +30,12 @@ void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packe
 	 char packet_dstip[INET_ADDRSTRLEN];
 
 	 strcpy(packet_srcip, inet_ntoa(ip_hdr->ip_src)); // source ip address
-	 strcpy(pakcet_dstip, inet_ntoa(ip_hdr->ip_dst)); // destination ip address
+	 strcpy(packet_dstip, inet_ntoa(ip_hdr->ip_dst)); // destination ip address
 
-	 int packet_id = tohs(ip_hdr -> ip_id), // identification 
+	 int packet_id = ntohs(ip_hdr -> ip_id), // identification 
 	     packet_ttl = ip_hdr -> ip_ttl,     // time to live 
 	     packet_tos = ip_hdr -> ip_tos,     // type of service
-	     packet_len = tohs(ip_hdr -> ip_len), // header length + data length
+	     packet_len = ntohs(ip_hdr -> ip_len), // header length + data length
 	     packet_hlen = ip_hdr -> ip_hl;      // header length
 
 	 // Printing 
@@ -59,7 +60,7 @@ int main( int argc, char const *argvc[])
 	// Declaring the device name and error buffer size
 	// PCAP_ERRBUF_SIZE is defined in pcah.h
 
-	char *device = "ens192";
+	char device[50] = "ens192";
 	char error_buffer[PCAP_ERRBUF_SIZE];
 	int snaplen = BUFSIZ;
 	int promisc = 0;
@@ -71,7 +72,8 @@ int main( int argc, char const *argvc[])
 	// Override the device with user input
 	if(argc > 1) 
 	{
-		strncpy(device, argvc[1], (sizeof(argvc[1] - 1)));
+		strncpy(device, argvc[1], (sizeof(device)));
+		device[sizeof(device) - 1] = '\0';
 	}
 
 	global_capdev= pcap_open_live(device, snaplen, promisc, timeout_ms, error_buffer);

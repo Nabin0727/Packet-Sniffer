@@ -9,10 +9,37 @@
 //Global function to handel signal
 static pcap_t *global_capdev = NULL;
 
+// Link header length 
+int link_hdr_length = 0;
+
+
 // Call me function
 void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packetd_ptr)
 {
-	printf("Captured Packet: length=%u\n", pkthdr->len);
+	//printf("Captured Packet: length=%u\n", pkthdr->len);
+	packetd_ptr += link_hdr_length;
+
+	struct ip *ip_hdr = (struct ip*) packetd_ptr;
+
+	// inet_ntoa() writes it's result to an address and return this address, but subswquent calls to inet_ntoa() also 
+	// write to the same address so we need to copy the resut to a buffer.
+	 char packet_srcip[INET_ADDRSTRLEN];
+	 char packet_dstip[INET_ADDRSTRLEN];
+
+	 strcpy(packet_srcip, inet_ntoa(ip_hdr->ip_src)); // source ip address
+	 strcpy(pakcet_dstip, inet_ntoa(ip_hdr->ip_dst)); // destination ip address
+
+	 int packet_id = tohs(ip_hdr -> ip_id), // identification 
+	     packet_ttl = ip_hdr -> ip_ttl,     // time to live 
+	     packet_tos = ip_hdr -> ip_tos,     // type of service
+	     packet_len = tohs(ip_hdr -> ip_len), // header length + data length
+	     packet_hlen = ip_hdr -> ip_hl;      // header length
+
+	 // Printing 
+	 printf("\n***********************************************\n");
+	 printf("ID: %d | SRC: %s | DST: %s | TOS: 0x%x | TTL: %d\n", packet_id, packet_srcip, packet_dstip, packet_tos, packet_ttl);
+
+
 }
 
 // SIGINT handler

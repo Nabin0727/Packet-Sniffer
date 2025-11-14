@@ -5,6 +5,8 @@
 #include<stdlib.h>
 #include<string.h>
 #include<signal.h>
+#include<arpa/inet.h>
+#include<netinet/inet.h>
 
 //Global function to handel signal
 static pcap_t *global_capdev = NULL;
@@ -80,6 +82,22 @@ int main( int argc, char const *argvc[])
 	{
 		fprintf(stderr, "Error opening devices %s: %s\n", device, error_buffer);
 		return 1;
+	}
+
+	int link_hdr_type = pcap_datalink(global_capdev);
+
+	switch(link_hdr_type)
+	{
+		case DLT_NULL:
+			link_hdr_type = 4;
+			break;
+
+		case DLT_EN10MB:
+			link_hdr_type = 14;
+			break;
+
+		default:
+			link_hdr_type = 0;
 	}
 
 	// Let's limit the capture to 5 packets 

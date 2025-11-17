@@ -78,8 +78,8 @@ void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packe
 	{
 		case IPPROTO_TCP:
 			tcp_header = (struct tcphdr *)packetd_ptr;
-			src_port = tcp_header -> th_sport;
-			dst_port = tcp_header -> th_dport;
+			src_port = ntohs(tcp_header -> th_sport);
+			dst_port = ntohs(tcp_header -> th_dport);
 			printf("PROTO: TCP | FLAGS %c%c%c | SPORT: %d | DPORT: %d |\n",
 					(tcp_header->th_flags & TH_SYN ? 'S' : '-'),
 					(tcp_header->th_flags & TH_ACK ? 'A' : '-'),
@@ -89,8 +89,8 @@ void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packe
 		
 		case IPPROTO_UDP:
 			udp_header = (struct udphdr*)packetd_ptr;
-			src_port = udp_header->uh_sport;
-			dst_port = udp_header->uh_dport;
+			src_port = ntohs(udp_header->uh_sport);
+			dst_port = ntohs(udp_header->uh_dport);
 			printf("PROTO: UDP | SPORT: %d | DPORT: %d |\n", src_port, dst_port);
 			break;
 
@@ -145,9 +145,9 @@ int main( int argc, char const *argvc[])
 		return 1;
 	}
 
-	int link_hdr_type = pcap_datalink(global_capdev);
+	int data_link = pcap_datalink(global_capdev);
 
-	switch(link_hdr_type)
+	switch(data_link)
 	{
 		case DLT_NULL:
 			link_hdr_type = 4;

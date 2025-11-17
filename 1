@@ -67,7 +67,7 @@ void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packe
 
 
 	packetd_ptr += packet_hlen;
-	int protocol_type = ip_hdr -> protocol;
+	int protocol_type = ip_hdr -> ip_p;
 
 	struct tcphdr *tcp_header;
 	struct udphdr *udp_header;
@@ -78,7 +78,7 @@ void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packe
 	{
 		case IPPROTO_TCP:
 			tcp_header = (struct tcphdr *)packetd_ptr;
-			src_port = tcp_header -> th_sport;
+			src_port = tcp_header -> th_port;
 			dst_port = tcp_header -> th_dport;
 			printf("PROTO: TCP | FLAGS %c%c%c | SPORT: %d | DPORT: %d |\n",
 					(tcp_header->th_flags & TH_SYN ? 'S' : '-'),

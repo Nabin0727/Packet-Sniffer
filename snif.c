@@ -20,27 +20,47 @@ int link_hdr_length = 0;
 void call_me(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packetd_ptr)
 {
 	//printf("Captured Packet: length=%u\n", pkthdr->len);
-	packetd_ptr += link_hdr_length;
+	packetd_ptr += link_hdr_length;   // Move pointer past link-layer header (Ethernet = 14  bytes)
 
-	struct ip *ip_hdr = (struct ip*) packetd_ptr;
+//	struct ip *ip_hdr = (struct ip*) packetd_ptr;
+//
+//	// inet_ntoa() writes it's result to an address and return this address, but subswquent calls to inet_ntoa() also 
+//	// write to the same address so we need to copy the resut to a buffer.
+//	char packet_srcip[INET_ADDRSTRLEN];
+//	char packet_dstip[INET_ADDRSTRLEN];
+//
+//	 strcpy(packet_srcip, inet_ntoa(ip_hdr->ip_src)); // source ip address
+//	 strcpy(packet_dstip, inet_ntoa(ip_hdr->ip_dst)); // destination ip address
+//
+//	 int packet_id = ntohs(ip_hdr -> ip_id), // identification 
+//	     packet_ttl = ip_hdr -> ip_ttl,     // time to live 
+//	     packet_tos = ip_hdr -> ip_tos,     // type of service
+//	     packet_len = ntohs(ip_hdr -> ip_len), // header length + data length
+//	     packet_hlen = ip_hdr -> ip_hl;      // header length
 
-	// inet_ntoa() writes it's result to an address and return this address, but subswquent calls to inet_ntoa() also 
-	// write to the same address so we need to copy the resut to a buffer.
-	 char packet_srcip[INET_ADDRSTRLEN];
-	 char packet_dstip[INET_ADDRSTRLEN];
+	// We will be using inet_ntop() instead of inet_ntoa()
+	// Interpret remaining bytes as IPv4 header
+	struct iphdr *ip_hdr = (struct iphdr*)packetd_ptr;
 
-	 strcpy(packet_srcip, inet_ntoa(ip_hdr->ip_src)); // source ip address
-	 strcpy(packet_dstip, inet_ntoa(ip_hdr->ip_dst)); // destination ip address
+	char src_ip[INET_ADDRSTRLEN];
+	char dst_ip[INET_ADDRSTRLEN];
 
-	 int packet_id = ntohs(ip_hdr -> ip_id), // identification 
-	     packet_ttl = ip_hdr -> ip_ttl,     // time to live 
-	     packet_tos = ip_hdr -> ip_tos,     // type of service
-	     packet_len = ntohs(ip_hdr -> ip_len), // header length + data length
-	     packet_hlen = ip_hdr -> ip_hl;      // header length
+	// Convert source and destination IP address to text
+	inet_ntop(AF_INET, &(ip_hdr -> saddr), src_ip, INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &(ip_hdr -> daddr), dst_ip, INET_ADDRSTRLEN);
 
-	 // Printing 
-	 printf("\n***********************************************\n");
-	 printf("ID: %d | SRC: %s | DST: %s | TOS: 0x%x | TTL: %d\n", packet_id, packet_srcip, packet_dstip, packet_tos, packet_ttl);
+	// Extract fields (convert network -> host byter order where needed)
+	
+	int packet_id = ntohs(ip_hdr -> id);
+	int packet_ttl = ip_hdr -> ttl;
+	int packet_tos = ip_hdr -> tos;
+	int packet_len = ntohs(ip_hdr -> tot_len);
+	int packet_hlen = ip_hdr -> ihl *4; // ihl is in 32-bit words
+
+
+	// Printing 
+	printf("\n***********************************************\n");
+	printf("ID: %d | SRC: %s | DST: %s | TOS: 0x%x | TTL: %d\n", packet_id, src_ip, dst_ip, packet_tos, packet_ttl);
 
 
 }

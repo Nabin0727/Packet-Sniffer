@@ -150,15 +150,15 @@ int main( int argc, char const *argvc[])
 	switch(data_link)
 	{
 		case DLT_NULL:
-			link_hdr_type = 4;
+			link_hdr_length = 4;
 			break;
 
 		case DLT_EN10MB:
-			link_hdr_type = 14;
+			link_hdr_length = 14;
 			break;
 
 		default:
-			link_hdr_type = 0;
+			link_hdr_length = 0;
 	}
 
 	// Let's limit the capture to 5 packets 

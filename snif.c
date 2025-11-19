@@ -167,6 +167,22 @@ int main( int argc, char const *argvc[])
 			link_hdr_length = 0;
 	}
 
+	struct bpf_program fp;
+
+	if(strlen(filter_exp) > 0){
+		if(pcap_compile(global_capdev, &fp, filter_exp, 1, PCAP_NETMASK_UNKNOWN) == -1){
+			fprintf(stderr, "Error compiling filter %s : %s\n", filter_exp, pcap_geterr(global_capdev));
+			return 1;
+		}
+
+		if(pcap_setfilter(global_capdev, &fp) == -1){
+			fprintf(stderr, "Error setting filter %s: %s\n", filter_exp, pcap_geterr(global_capdev));
+			return 1;
+		}
+
+		printf("Filter set: %s\n", filter_exp);
+	}
+
 	// Let's limit the capture to 5 packets 
 	//int packets_count = 5;
 	

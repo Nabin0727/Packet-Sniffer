@@ -120,6 +120,8 @@ int main( int argc, char const *argvc[])
 	// PCAP_ERRBUF_SIZE is defined in pcah.h
 
 	char device[50] = "ens192";
+	//char *device = NULL;
+	char filter_exp[256] = {0};
 	char error_buffer[PCAP_ERRBUF_SIZE];
 	int snaplen = BUFSIZ;
 	int promisc = 0;
@@ -129,10 +131,14 @@ int main( int argc, char const *argvc[])
 	//
 
 	// Override the device with user input
-	if(argc > 1) 
+	if(argc >= 2){
+		strncpy(device, argv[1], sizeof(device)-1);
+		device[sizeof(device)-1] = '\0';
+	}
+	if(argc > 3) 
 	{
-		strncpy(device, argvc[1], (sizeof(device)));
-		device[sizeof(device) - 1] = '\0';
+		strncpy(filter_exp, argv[2], (sizeof(filter_exp)-1));
+		filter_exp[sizeof(filter_exp) - 1] = '\0';
 	}
 
 	global_capdev= pcap_open_live(device, snaplen, promisc, timeout_ms, error_buffer);

@@ -132,12 +132,12 @@ int main( int argc, char const *argvc[])
 
 	// Override the device with user input
 	if(argc >= 2){
-		strncpy(device, argv[1], sizeof(device)-1);
+		strncpy(device, argvc[1], sizeof(device)-1);
 		device[sizeof(device)-1] = '\0';
 	}
 	if(argc > 3) 
 	{
-		strncpy(filter_exp, argv[2], (sizeof(filter_exp)-1));
+		strncpy(filter_exp, argvc[2], (sizeof(filter_exp)-1));
 		filter_exp[sizeof(filter_exp) - 1] = '\0';
 	}
 
